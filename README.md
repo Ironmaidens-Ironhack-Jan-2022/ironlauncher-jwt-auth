@@ -105,6 +105,20 @@ const { isAuthenticated } = require("./middleware/jwt.middleware");
 const { isAuthenticated } = require("../middleware/jwt.middleware");
 ```
 
+### Create new route in auth.routes. /verify
+
+```javascript
+router.get("/verify", isAuthenticated, (req, res, next) => {
+  console.log(`req.payload`, req.payload);
+
+  res.json(req.payload);
+});
+```
+
+- Remove route /logout if you have it
+
+### (in app.js)
+
 - if you want to protect all your routes, you can do it this way:
 
 ```javascript
