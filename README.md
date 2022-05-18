@@ -22,15 +22,16 @@ npm uninstall express-session connect-mongo
   In router.post("/login" add below:
 
 ```javascript
-bcrypt.compare(password, user.password).then((isSamePassword) => {
-  if (!isSamePassword) {
-    return res.status(400).json({ errorMessage: "Wrong credentials." });
-  }
+  // Compare the provided password with the one saved in the database
+      const passwordCorrect = bcrypt.compareSync(password, foundUser.password);
 
-  const payload = {
-    _id: user._id,
-    username: user.username,
-  };
+      if (passwordCorrect) { // login was successful
+
+        // Deconstruct the user object to omit the password
+        const { _id, email } = foundUser;
+
+        // Create an object that will be set as the token payload
+        const payload = { _id, email };
 
   const authToken = jwt.sign(payload, process.env.TOKEN_SECRET, {
     algorithm: "HS256",
