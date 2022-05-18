@@ -74,7 +74,7 @@ app.use((req, res, next) => {
 - we do not store info in session
 - we generate & sign a token + we send it in the response
 
-- `javascript const jwt = require("jsonwebtoken")`
+- `const jwt = require("jsonwebtoken")`
 
 - generate token after you check that password is correct.
 
