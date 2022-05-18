@@ -29,8 +29,7 @@ npm uninstall bcrypt
 - DELETE:
 
 ```javascript
-config / index.js;
-Delete; // ℹ️ Session middleware for authentication
+// ℹ️ Session middleware for authentication
 // https://www.npmjs.com/package/express-session
 const session = require("express-session");
 
