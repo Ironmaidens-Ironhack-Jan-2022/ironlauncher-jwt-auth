@@ -9,11 +9,64 @@ npm i jsonwebtoken express-jwt
 npm uninstall express-session connect-mongo
 ```
 
+- necessary for this code, but deppends on your code in auth.routes:
+
+```javascript
+npm install bcryptjs
+npm uninstall bcrypt
+```
+
 ## Steps
 
-### 1.
+## 0. Delete all code for session, for example in config/index.js
 
-### (in auth.routes.js)
+- DELETE:
+
+```javascript
+config / index.js;
+Delete; // ℹ️ Session middleware for authentication
+// https://www.npmjs.com/package/express-session
+const session = require("express-session");
+
+// ℹ️ MongoStore in order to save the user session in the database
+// https://www.npmjs.com/package/connect-mongo
+const MongoStore = require("connect-mongo");
+
+// ℹ️ Middleware that adds a "req.session" information and later to check that you are who you say you are 😅
+app.use(
+  session({
+    secret: process.env.SESSION_SECRET || "super hyper secret key",
+    resave: false,
+    saveUninitialized: false,
+    store: MongoStore.create({
+      mongoUrl: MONGO_URI,
+    }),
+    cookie: {
+      maxAge: 1000 * 60 * 60 * 24 * 365,
+      sameSite: "none",
+      secure: process.env.NODE_ENV === "production",
+    },
+  })
+);
+
+app.use((req, res, next) => {
+  req.user = req.session.user || null;
+  next();
+});
+```
+
+## 1. Modify auth routes
+
+## in auth.routes.js
+
+### POST /signup
+
+- "can" be modified (we don't need to store info in session + can automatically log in the user)
+
+### POST /login
+
+- we do not store info in session
+- we generate & sign a token + we send it in the response
 
 - `javascript const jwt = require("jsonwebtoken")`
 
@@ -42,11 +95,19 @@ npm uninstall express-session connect-mongo
 });
 ```
 
-### (in .env file)
+### in .env file
 
 - `TOKEN_SECRET=<yoursecret>`
 
-### 2.
+### example of current .env file
+
+```javascript
+PORT = 5005;
+TOKEN_SECRET = "keyboard cat";
+ORIGIN = "http://localhost:3000";
+```
+
+## 2. Create middleware
 
 - in middleware folder create jwt.middleware.js file and delete isLoggedIn + isLoggedOut
 
@@ -54,9 +115,7 @@ npm uninstall express-session connect-mongo
 
 `router.post("/login", isLoggedOut, (req, res, next) => {`
 
-### (in jwt.middleware.js)
-
-- create JWT token validation middleware
+### in jwt.middleware.js
 
 ```javascript
 const { expressjwt } = require("express-jwt");
@@ -90,23 +149,23 @@ module.exports = {
 };
 ```
 
-### 3.
+## 3. Require this middleware and include it in routes
 
-- require this middleware and include it in routes
-
-### (in auth.routes.js )
+### in auth.routes.js
 
 ```javascript
 const { isAuthenticated } = require("./middleware/jwt.middleware");
 ```
 
-### (in index.routes.js)
+### in index.routes.js
 
 ```javascript
 const { isAuthenticated } = require("../middleware/jwt.middleware");
 ```
 
-### Create new route in auth.routes. /verify
+## 4. Create new route in auth.routes
+
+### GET /verify
 
 ```javascript
 router.get("/verify", isAuthenticated, (req, res, next) => {
@@ -118,7 +177,17 @@ router.get("/verify", isAuthenticated, (req, res, next) => {
 
 - Remove route /logout if you have it
 
-### (in app.js)
+## 5. Create 401 error in error-handling/index.js
+
+### add code to send a 401
+
+```javascript
+if (err.name === "UnauthorizedError") {
+  res.status(401).json({ message: "invalid token..." });
+}
+```
+
+### in app.js
 
 - if you want to protect all your routes, you can do it this way:
 
