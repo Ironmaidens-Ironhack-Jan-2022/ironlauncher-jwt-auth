@@ -193,6 +193,8 @@ if (err.name === "UnauthorizedError") {
 }
 ```
 
+## 6. Optional
+
 ### in app.js
 
 - if you want to protect all your routes, you can do it this way:
