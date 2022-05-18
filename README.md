@@ -1,4 +1,4 @@
-# Steps to change from session to token
+# Steps to change from session to token-based authentication
 
 This repository contains all the steps needed to switch from session to token after installation with `npx ironlauncher <project name> --auth -json`.
 You can test the code in combination with the following repository, which contains the code for all steps for jwt authentication in React / client-side:
